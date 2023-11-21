@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     datatype::CompositeValue,
-    element::{Emphasis, Label, LineStyle, Orient},
+    element::{Emphasis, Label, LineStyle, Orient, ItemStyle},
 };
 
 #[derive(Serialize)]
@@ -13,7 +13,7 @@ pub enum SankeyNodeAlign {
     Justify,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SankeyNode {
     pub name: String,
@@ -23,17 +23,37 @@ pub struct SankeyNode {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depth: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub item_style: Option<ItemStyle>,
 }
 
-impl<S> From<S> for SankeyNode
-where
-    S: Into<String>,
+// FIXME revive
+// impl<N> From<N> for SankeyNode
+// where
+//     N: Into<String>,
+// {
+//     fn from(name: N) -> Self {
+//         SankeyNode {
+//             name: name.into(),
+//             value: None,
+//             depth: None,
+//             item_style: None,
+//         }
+//     }
+// }
+
+impl<N,S> From<(N,S)> for SankeyNode
+    where
+        N: Into<String>,
+        S: Into<ItemStyle>,
 {
-    fn from(name: S) -> Self {
+    fn from((name, style): (N,S)) -> Self {
         SankeyNode {
             name: name.into(),
             value: None,
             depth: None,
+            item_style: Some(style.into()),  // FIXME refactor
         }
     }
 }
